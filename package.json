@@ -1,0 +1,25 @@
+{
+  "name": "pico-fin",
+  "version": "1.0.0",
+  "description": "Making fun samples with PicoGL.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sjfricke/Pico-Fun.git"
+  },
+  "keywords": [
+    "PicoGL",
+    "WebGL2"
+  ],
+  "author": "Spencer Fricke",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sjfricke/Pico-Fun/issues"
+  },
+  "homepage": "https://github.com/sjfricke/Pico-Fun#readme",
+  "dependencies": {
+  }
+}
