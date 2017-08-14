@@ -5,12 +5,49 @@
     <title>Triangle</title>
   	<script src="../libs/picogl.js"></script>
   	<!-- <script src="../libs/picogl.min.js"></script> -->
+    <script src="../libs/utils.js"></script>
     <script src="../libs/gl-matrix-min.js"></script>
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
     <canvas id="gl-canvas"></canvas>
-    <script id="picking-vs" type="x-vertex-shader">
+    <script type="shader/vs" id="vs">
+        #version 300 es
+        layout(std140, column_major) uniform;
+        layout(location=0) in vec4 position;
+        
+        uniform SceneUniforms {
+            mat4 viewProj;
+        };
+
+        uniform mat4 uModel;
+        
+        out vec3 vPosition;
+
+        void main() {
+            vec4 worldPosition = uModel * position;
+            vPosition = worldPosition.xyz;
+            gl_Position = viewProj * worldPosition;
+        }
     </script>
-    </body>
+    <script type="shader/fs" id="fs">
+        #version 300 es
+        precision highp float;
+        layout(std140, column_major) uniform;
+        
+        uniform SceneUniforms {
+            mat4 viewProj;
+        };
+
+        in vec3 vPosition;
+        
+        out vec4 fragColor;
+        void main() {
+            fragColor = vec4(1.0, 0.0, vPosition.x / 1.0, 1.0);
+        }
+    </script>
+
+
+</body>
+<script type="text/javascript" src="main.js"></script>
 </html>
