@@ -19,9 +19,7 @@ var vsSource =  document.getElementById("vs").text.trim();
 var fsSource =  document.getElementById("fs").text.trim();
 var program = app.createProgram(vsSource, fsSource);
 // GEOMETRY IN VERTEX BUFFERS
-var box = utils.createBox({dimensions: [1.0, 1.0, 1.0]})
-
-var positions = app.createVertexBuffer(PicoGL.FLOAT, 3, box.positions);
+var positions = app.createVertexBuffer(PicoGL.FLOAT, 3, bunny_points);
 // COMBINE VERTEX BUFFERS INTO VERTEX ARRAY
 var triangleArray = app.createVertexArray()
 .attributeBuffer(0, positions)
@@ -54,7 +52,7 @@ window.onresize = function() {
 }
 
 // CREATE DRAW CALL FROM PROGRAM AND VERTEX ARRAY
-var drawCall = app.createDrawCall(program, triangleArray)
+var drawCall = app.createDrawCall(program, triangleArray, PicoGL.POINTS)
 .uniformBlock("SceneUniforms", sceneUniformBuffer);
 
 // Only runs first time so block appears on load
