@@ -2,12 +2,15 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Triangle</title>
-  	<script src="../libs/picogl.js"></script>
-  	<!-- <script src="../libs/picogl.min.js"></script> -->
-    <script src="../libs/utils.js"></script>
-    <script src="../libs/gl-matrix-min.js"></script>
-    <link rel="stylesheet" href="style.css"> 
+    <title>WebGL 2 Point Cloud Viewer</title>
+    {{if .Production}}
+    <script src="libs/picogl.min.js"></script>
+    {{else}}
+    <script src="libs/picogl.js"></script>
+    {{end}}
+    <script src="libs/utils.js"></script>
+    <script src="libs/gl-matrix-min.js"></script>
+    <link rel="stylesheet" href="styles/style.css"> 
 </head>
 <body>
     <canvas id="gl-canvas"></canvas>
@@ -49,6 +52,6 @@
 
 
 </body>
-<script type="text/javascript" src="bunny_points.js"></script>
-<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="models/bunny_points.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
 </html>
