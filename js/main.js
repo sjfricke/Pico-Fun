@@ -22,21 +22,23 @@ var program = app.createProgram(vsSource, fsSource);
 var positions = app.createVertexBuffer(PicoGL.FLOAT, 3, bunny_points);
 // COMBINE VERTEX BUFFERS INTO VERTEX ARRAY
 var triangleArray = app.createVertexArray()
-.attributeBuffer(0, positions)
+.attributeBuffer(0, positions);
 
 // SET UP UNIFORM BUFFER
 var projMatrix = mat4.create();
-mat4.perspective(projMatrix, Math.PI / 2, canvas.width / canvas.height, 0.1, 10.0);
 var viewMatrix = mat4.create();
 var eyePosition = vec3.fromValues(1, 1, 1);
-mat4.lookAt(viewMatrix, eyePosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
 var viewProjMatrix = mat4.create();
+
+mat4.perspective(projMatrix, Math.PI / 2, canvas.width / canvas.height, 0.1, 10.0);
+mat4.lookAt(viewMatrix, eyePosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
 mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
 var sceneUniformBuffer = app.createUniformBuffer([
     PicoGL.FLOAT_MAT4,
 ])
 .set(0, viewProjMatrix)
 .update();
+
 var modelMatrix = mat4.create();
 var rotateXMatrix = mat4.create();
 var rotateYMatrix = mat4.create();
@@ -52,7 +54,8 @@ window.onresize = function() {
 }
 
 // CREATE DRAW CALL FROM PROGRAM AND VERTEX ARRAY
-var drawCall = app.createDrawCall(program, triangleArray, PicoGL.POINTS)
+//var drawCall = app.createDrawCall(program, triangleArray, PicoGL.POINTS)
+var drawCall = app.createDrawCall(program, triangleArray)
 .uniformBlock("SceneUniforms", sceneUniformBuffer);
 
 // Only runs first time so block appears on load
@@ -60,6 +63,10 @@ mat4.fromXRotation(rotateXMatrix, angleX);
 mat4.fromYRotation(rotateYMatrix, angleY);
 mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
 drawCall.uniform("uModel", modelMatrix);
+
+// Mouse and Keyboard events listeners
+canvas.addEventListener('wheel', mousewheel, false);
+window.addEventListener('keydown', keydown, false);
 
 function draw() {      
     if (timer.ready()) {
@@ -75,8 +82,25 @@ function draw() {
 }
 requestAnimationFrame(draw);
 
+// Mouse and keyboard event functions
+
+// zooms into the point cloud by going towards origin
+function mousewheel(event) {
+    if (event.deltaY < 0){  // Zoom in 
+        eyePosition[2] += 0.1;
+    }
+    else { // Zoom out
+        eyePosition[2] -= 0.1;
+    }
+
+    mat4.perspective(projMatrix, Math.PI / 2, canvas.width / canvas.height, 0.1, 10.0);
+    mat4.lookAt(viewMatrix, eyePosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+    mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
+    sceneUniformBuffer.set(0, viewProjMatrix).update();
+}
+
 // rotate with arrow keys
-window.addEventListener('keydown', function(event) {
+function keydown(event) {
     switch(event.keyCode) {
     case 37: // left
         angleX -= .05;
@@ -99,4 +123,4 @@ window.addEventListener('keydown', function(event) {
     mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
     drawCall.uniform("uModel", modelMatrix);
    
-});
+};
