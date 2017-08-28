@@ -3,9 +3,13 @@ package main
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
+	_"github.com/sjfricke/goply"
 )
 
 func main() {
+
+	//goply.Test()
+
 	router := gin.Default()
 
 	router.LoadHTMLGlob("templates/index.html");

@@ -1,5 +1,13 @@
 utils.addTimerElement();
 
+// initalize event variables "e_" prefix == "event variable"
+var e_theta = 0;
+var e_phi = 0;
+var e_amortization = 0.50; // increase for less resistant after drag release
+var e_drag = false;
+var e_oldX = 0, e_oldY = 0;
+var e_drag_dX = 0, e_drag_dY = 0;
+
 var canvas = document.getElementById("gl-canvas");
 if (!utils.testWebGL2()) {
     console.error("WebGL 2 not available");
@@ -27,7 +35,7 @@ var triangleArray = app.createVertexArray()
 // SET UP UNIFORM BUFFER
 var projMatrix = mat4.create();
 var viewMatrix = mat4.create();
-var eyePosition = vec3.fromValues(1, 1, 1);
+var eyePosition = vec3.fromValues(1, 1, 5);
 var viewProjMatrix = mat4.create();
 
 mat4.perspective(projMatrix, Math.PI / 2, canvas.width / canvas.height, 0.1, 10.0);
@@ -64,10 +72,6 @@ mat4.fromYRotation(rotateYMatrix, angleY);
 mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
 drawCall.uniform("uModel", modelMatrix);
 
-// Mouse and Keyboard events listeners
-canvas.addEventListener('wheel', mousewheel, false);
-window.addEventListener('keydown', keydown, false);
-
 function draw() {      
     if (timer.ready()) {
         utils.updateTimerElement(timer.cpuTime, timer.gpuTime);
@@ -75,52 +79,23 @@ function draw() {
     timer.start();
     // DRAW
     app.clear();
+
+    if (!e_drag) {
+       e_drag_dX *= e_amortization, e_drag_dY*=e_amortization;
+       e_theta+=e_drag_dX, e_phi+=e_drag_dY;
+      // mat4.fromXRotation(rotateXMatrix, e_phi);
+        //mat4.fromYRotation(rotateYMatrix, e_theta);
+        
+    }
+
+     mat4.fromXRotation(rotateXMatrix, e_phi);
+     mat4.fromYRotation(rotateYMatrix, e_theta);   
+    mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
+        drawCall.uniform("uModel", modelMatrix);
+
     drawCall.draw();
     
     timer.end();
     requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
-
-// Mouse and keyboard event functions
-
-// zooms into the point cloud by going towards origin
-function mousewheel(event) {
-    if (event.deltaY < 0){  // Zoom in 
-        eyePosition[2] += 0.1;
-    }
-    else { // Zoom out
-        eyePosition[2] -= 0.1;
-    }
-
-    mat4.perspective(projMatrix, Math.PI / 2, canvas.width / canvas.height, 0.1, 10.0);
-    mat4.lookAt(viewMatrix, eyePosition, vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
-    mat4.multiply(viewProjMatrix, projMatrix, viewMatrix);
-    sceneUniformBuffer.set(0, viewProjMatrix).update();
-}
-
-// rotate with arrow keys
-function keydown(event) {
-    switch(event.keyCode) {
-    case 37: // left
-        angleX -= .05;
-        break;
-    case 39: // right
-        angleX += .05;
-        break; 
-    case 38: // up
-        angleY += .05;
-        break;
-    case 40: // down
-        angleY -= .05;
-        break;   
-    default:
-        return;       
-    }
-
-    mat4.fromXRotation(rotateXMatrix, angleX);
-    mat4.fromYRotation(rotateYMatrix, angleY);
-    mat4.multiply(modelMatrix, rotateXMatrix, rotateYMatrix);
-    drawCall.uniform("uModel", modelMatrix);
-   
-};
